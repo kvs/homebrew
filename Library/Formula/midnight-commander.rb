@@ -18,6 +18,10 @@ class MidnightCommander < Formula
   depends_on 's-lang'
   depends_on 'libssh2'
 
+  def patches
+    DATA
+  end
+
   def install
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
@@ -29,3 +33,30 @@ class MidnightCommander < Formula
     system "make install"
   end
 end
+
+__END__
+diff --git a/src/subshell.c b/src/subshell.c
+index 70378b2..74daba0 100644
+--- a/src/subshell.c
++++ b/src/subshell.c
+@@ -770,7 +770,7 @@ init_subshell (void)
+ {
+     /* This must be remembered across calls to init_subshell() */
+     static char pty_name[BUF_SMALL];
+-    char precmd[BUF_SMALL];
++    char precmd[BUF_SMALL*4];
+ 
+     switch (check_sid ())
+     {
+@@ -900,10 +900,9 @@ init_subshell (void)
+         break;
+     case FISH:
+         g_snprintf (precmd, sizeof (precmd),
+-                    "function fish_prompt ; pwd>&%d;kill -STOP %%self; end\n",
++                    " functions -c fish_prompt __mc_saved_fish_prompt; function fish_prompt; while test -z (pwd); cd ..; end; __mc_saved_fish_prompt; pwd>&%d; kill -STOP %%self; end\n",
+                     subshell_pipe[WRITE]);
+         break;
+-
+     }
+     write_all (mc_global.tty.subshell_pty, precmd, strlen (precmd));
+ 
