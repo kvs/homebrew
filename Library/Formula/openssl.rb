@@ -1,14 +1,13 @@
 class Openssl < Formula
   homepage "https://openssl.org"
-  url "https://www.openssl.org/source/openssl-1.0.1j.tar.gz"
-  mirror "https://raw.githubusercontent.com/DomT4/LibreMirror/master/OpenSSL/openssl-1.0.1j.tar.gz"
-  sha256 "1b60ca8789ba6f03e8ef20da2293b8dc131c39d83814e775069f02d26354edf3"
-  revision 1
+  url "https://www.openssl.org/source/openssl-1.0.1l.tar.gz"
+  mirror "https://raw.githubusercontent.com/DomT4/LibreMirror/master/OpenSSL/openssl-1.0.1l.tar.gz"
+  sha256 "b2cf4d48fe5d49f240c61c9e624193a6f232b5ed0baf010681e725963c40d1d4"
 
   bottle do
-    sha1 "ffc47898c5c5599745b644c1889e473418a18d5a" => :yosemite
-    sha1 "65e125a4777eb6dfb63f01a18f724246123dd79e" => :mavericks
-    sha1 "511057d68144943d149cea76718db55656c73dff" => :mountain_lion
+    sha1 "1d804c229e7a49cf98c1211dd2524c1b258a0388" => :yosemite
+    sha1 "c5087d42713738542d32eb50dbfcdf5143cb5ad3" => :mavericks
+    sha1 "4a72fe4a9d5d5914822d82f42df2c0f3392bfa6e" => :mountain_lion
   end
 
   option :universal

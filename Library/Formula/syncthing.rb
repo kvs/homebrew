@@ -1,11 +1,11 @@
 class Syncthing < Formula
   homepage "http://syncthing.net"
-  url "https://github.com/syncthing/syncthing.git", :tag => "v0.10.17"
+  url "https://github.com/syncthing/syncthing.git", :tag => "v0.10.20"
 
   bottle do
-    sha1 "662ecddb853ea40e7ff4ce2dd78fc95a2753cbf5" => :yosemite
-    sha1 "a3e4911be66dbd3d6d3fc16ce340e355422deed0" => :mavericks
-    sha1 "55d0fb3a54f50706d6b96de4c2701ea0f6dc8f8e" => :mountain_lion
+    sha1 "349060dc160834541c5f01e690425c1b7b0ed4a6" => :yosemite
+    sha1 "64227b52cc5898c341be4a94bee2c0971bc0a9bd" => :mavericks
+    sha1 "87d89b03f992bc92a4ce2e5ce9a5e201ef42e8f7" => :mountain_lion
   end
 
   depends_on "go" => :build
@@ -31,11 +31,6 @@ class Syncthing < Formula
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
       <dict>
-        <key>EnvironmentVariables</key>
-        <dict>
-          <key>STNORESTART</key>
-          <string>yes</string>
-        </dict>
         <key>KeepAlive</key>
         <true/>
         <key>Label</key>
@@ -44,6 +39,7 @@ class Syncthing < Formula
         <array>
           <string>#{opt_bin}/syncthing</string>
           <string>-no-browser</string>
+          <string>-no-restart</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
