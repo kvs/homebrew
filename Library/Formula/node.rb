@@ -1,15 +1,22 @@
 # Note that x.even are stable releases, x.odd are devel releases
 class Node < Formula
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v0.10.35/node-v0.10.35.tar.gz"
-  sha256 "0043656bb1724cb09dbdc960a2fd6ee37d3badb2f9c75562b2d11235daa40a03"
-  revision 2
+  url "https://nodejs.org/dist/v0.10.36/node-v0.10.36.tar.gz"
+  sha256 "b9d7d1d0294bce46686b13a05da6fc5b1e7743b597544aa888e8e64a9f178c81"
 
   bottle do
-    revision 1
-    sha1 "a98a1df66cfb0712b14489186c46f7087ba35bd7" => :yosemite
-    sha1 "0cd45412840a67d5d65e6bc3c0c3bcf8bc23153c" => :mavericks
-    sha1 "977332381c033626b991002c27e738c144ebbaac" => :mountain_lion
+    sha1 "ca405f33a5c8e3356a0f477eee43e492e7925927" => :yosemite
+    sha1 "f17dfa5a02a7f83b46f0deb40a4746a1337ffa88" => :mavericks
+    sha1 "b5d7094ed826813b2cc35303bcde8269b1ad9292" => :mountain_lion
+  end
+
+  devel do
+    url "https://nodejs.org/dist/v0.11.16/node-v0.11.16.tar.gz"
+    sha256 "f0d141faa1f7da3aff53e9615d76040d29c0650542be3b09ee80aca2f2cc61f6"
+
+    depends_on "pkg-config" => :build
+    depends_on "icu4c" => :optional
+    depends_on "openssl" => :optional
   end
 
   head do
@@ -27,30 +34,39 @@ class Node < Formula
 
   depends_on :python => :build
 
-  # Once we kill off SSLv3 in our OpenSSL consider forcing our OpenSSL
-  # over Node's shipped version with --shared-openssl.
-  # Would allow us quicker security fixes than Node's release schedule.
-  # See https://github.com/joyent/node/issues/3557 for prior discussion.
+  # Once we kill off SSLv3 in our OpenSSL consider making our OpenSSL
+  # an optional dep across the whole range of Node releases.
 
   fails_with :llvm do
     build 2326
   end
 
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-2.1.18.tgz"
-    sha1 "e2af4c5f848fb023851cd2ec129005d33090bd57"
+    url "https://registry.npmjs.org/npm/-/npm-2.3.0.tgz"
+    sha1 "3588ec5c18fb5ac41e5721b0ea8ece3a85ab8b4b"
   end
 
   def install
-    args = %W{--prefix=#{prefix} --without-npm}
+    args = %W[--prefix=#{prefix} --without-npm]
     args << "--debug" if build.with? "debug"
     args << "--without-ssl2" << "--without-ssl3" if build.stable?
 
-    # This should eventually be able to use the system icu4c, but right now
-    # it expects to find this dependency using pkgconfig.
     if build.head?
-      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["icu4c"].opt_prefix}/lib/pkgconfig"
+      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["icu4c"].opt_lib}/pkgconfig"
       args << "--with-intl=system-icu"
+    end
+
+    if build.devel?
+      if build.with? "icu4c"
+        ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["icu4c"].opt_lib}/pkgconfig"
+        args << "--with-intl=system-icu"
+      end
+
+      if build.with? "openssl"
+        args << "--shared-openssl"
+      else
+        args << "--without-ssl2" << "--without-ssl3"
+      end
     end
 
     system "./configure", *args
