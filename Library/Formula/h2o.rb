@@ -1,13 +1,13 @@
 class H2o < Formula
   homepage "https://github.com/h2o/h2o/"
-  url "https://github.com/h2o/h2o/archive/v0.9.2.tar.gz"
-  sha1 "001f5aefcd829467ed64b328ff0d35b736593dec"
+  url "https://github.com/h2o/h2o/archive/v1.0.1.tar.gz"
+  sha1 "1c66c59123a3e23172b610380af5e78d5e95a78a"
   head "https://github.com/h2o/h2o.git"
 
   bottle do
-    sha1 "3a661417da4cf981935b3ec39a9e0401ce0cfb30" => :yosemite
-    sha1 "046477212770943f9e039fb73608d393cb5d6c61" => :mavericks
-    sha1 "1e4bf69b5e1f81c0b5c1bca54928643b613f312c" => :mountain_lion
+    sha1 "3f62c3b78c9351e9c581c1242e1d999a0ba50555" => :yosemite
+    sha1 "cc13b80fe91ae1ee827ca745e7f3692c76c941b7" => :mavericks
+    sha1 "f58b952c6fc29d9db30f506e3bc3edef6422725c" => :mountain_lion
   end
 
   option "with-libuv", "Build the H2O library in addition to the executable."
@@ -16,6 +16,7 @@ class H2o < Formula
   depends_on "libyaml"
   depends_on "openssl"
   depends_on "libuv" => :optional
+  depends_on "wslay" => :optional
 
   def install
     system "cmake", ".", *std_cmake_args
