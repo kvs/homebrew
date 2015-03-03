@@ -133,6 +133,10 @@ class FormulaAuditor
     if formula.class < GithubGistFormula
       problem "GithubGistFormula is deprecated, use Formula instead"
     end
+
+    if formula.class < AmazonWebServicesFormula
+      problem "AmazonWebServicesFormula is deprecated, use Formula instead"
+    end
   end
 
   @@aliases ||= Formula.aliases
@@ -318,6 +322,8 @@ class FormulaAuditor
       case p
       when %r[^http://ftp\.gnu\.org/]
         problem "ftp.gnu.org urls should be https://, not http:// (url is #{p})."
+      when %r[^http://archive\.apache\.org/]
+        problem "archive.apache.org urls should be https://, not http (url is #{p})."
       when %r[^http://code\.google\.com/]
         problem "code.google.com urls should be https://, not http (url is #{p})."
       when %r[^http://fossies\.org/]
@@ -401,11 +407,11 @@ class FormulaAuditor
   end
 
   def audit_specs
-    if head_only?(formula) && formula.tap != "Homebrew/homebrew-head-only"
+    if head_only?(formula) && formula.tap.downcase != "homebrew/homebrew-head-only"
       problem "Head-only (no stable download)"
     end
 
-    if devel_only?(formula) && formula.tap != "Homebrew/homebrew-devel-only"
+    if devel_only?(formula) && formula.tap.downcase != "homebrew/homebrew-devel-only"
       problem "Devel-only (no stable download)"
     end
 
