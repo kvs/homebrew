@@ -1,24 +1,15 @@
 class Ffmpeg < Formula
   homepage "https://ffmpeg.org/"
-  stable do
-    url "https://www.ffmpeg.org/releases/ffmpeg-2.5.4.tar.bz2"
-    sha1 "e7d0bab14e82876762531a883c6b48918631d48c"
-
-    # Fixes -framework flags for 10.7 and lower;
-    # fixed upstream, can be removed in the next release.
-    # https://trac.ffmpeg.org/ticket/4238
-    patch do
-      url "http://git.videolan.org/?p=ffmpeg.git;a=commitdiff_plain;h=83808ee7e9e89b0c83d5ecd94b35952c44716b68"
-      sha1 "918586c158e1231a8d59a78e6f05cedc83824d68"
-    end
-  end
+  url "https://www.ffmpeg.org/releases/ffmpeg-2.6.tar.bz2"
+  sha256 "23c38ecc0dd6cae5e9a3c5c2c967b10480dc4f7159d094ade13b0775d1fd4791"
+  revision 1
 
   head "git://git.videolan.org/ffmpeg.git"
 
   bottle do
-    sha1 "1d2f2630e86a06519f36263914ab79dc2f2fef72" => :yosemite
-    sha1 "d2dcb0fd8c650ad8b106ab3ab4fcd0b5512eb6aa" => :mavericks
-    sha1 "cddc9c78521770bc529e85f80f842dff678bc1e6" => :mountain_lion
+    sha256 "9447e3ff05a11e4eccf31a94f370eb90917f22dc89bc779f6cc8168dd19d8f16" => :yosemite
+    sha256 "7c30d6cb016cba4288c05b7ddb2f647e6c71d66ef07e4f602b847b29b92009ef" => :mavericks
+    sha256 "e7982ca40054a3a4017bcdb728407643427b535690c1314a277479a1f858401e" => :mountain_lion
   end
 
   option "without-x264", "Disable H.264 encoder"
@@ -45,7 +36,7 @@ class Ffmpeg < Formula
   depends_on "pkg-config" => :build
 
   # manpages won't be built without texi2html
-  depends_on "texi2html" => :build if MacOS.version >= :mountain_lion
+  depends_on "texi2html" => :build
   depends_on "yasm" => :build
 
   depends_on "x264" => :recommended
