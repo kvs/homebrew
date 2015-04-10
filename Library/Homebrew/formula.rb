@@ -466,8 +466,6 @@ class Formula
   end
 
   # Standard parameters for CMake builds.
-  # Using Build Type "None" tells cmake to use our CFLAGS,etc. settings.
-  # Setting it to Release would ignore our flags.
   # Setting CMAKE_FIND_FRAMEWORK to "LAST" tells CMake to search for our
   # libraries before trying to utilize Frameworks, many of which will be from
   # 3rd party installs.
@@ -475,8 +473,10 @@ class Formula
   # less consistent and the standard parameters are more memorable.
   def std_cmake_args
     %W[
+      -DCMAKE_C_FLAGS_RELEASE=
+      -DCMAKE_CXX_FLAGS_RELEASE=
       -DCMAKE_INSTALL_PREFIX=#{prefix}
-      -DCMAKE_BUILD_TYPE=None
+      -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_FIND_FRAMEWORK=LAST
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -Wno-dev
@@ -634,6 +634,7 @@ class Formula
     mktemp do
       @testpath = Pathname.pwd
       ENV["HOME"] = @testpath
+      setup_test_home @testpath
       test
     end
   ensure
@@ -657,6 +658,16 @@ class Formula
   end
 
   protected
+
+  def setup_test_home home
+    # keep Homebrew's site-packages in sys.path when testing with system Python
+    user_site_packages = home/"Library/Python/2.7/lib/python/site-packages"
+    user_site_packages.mkpath
+    (user_site_packages/"homebrew.pth").write <<-EOS.undent
+      import site; site.addsitedir("#{HOMEBREW_PREFIX}/lib/python2.7/site-packages")
+      import sys; sys.path.insert(0, "#{HOMEBREW_PREFIX}/lib/python2.7/site-packages")
+    EOS
+  end
 
   # Pretty titles the command and buffers stdout/stderr
   # Throws if there's an error
@@ -914,7 +925,7 @@ class Formula
     end
 
     def go_resource name, &block
-      resource name, Resource::Go, &block
+      specs.each { |spec| spec.go_resource(name, &block) }
     end
 
     def depends_on dep
