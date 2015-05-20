@@ -4,11 +4,12 @@ class OpenMpi < Formula
   # https://github.com/open-mpi/ompi/issues/579
   url "https://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.bz2"
   sha256 "23158d916e92c80e2924016b746a93913ba7fae9fff51bf68d5c2a0ae39a2f8a"
+  revision 1
 
   bottle do
-    sha1 "a6ec98d40ab34bf2eb4dbe9223d5aa430ba749ed" => :yosemite
-    sha1 "9d7366e69787c6b331fe5473c8025d86d8b79691" => :mavericks
-    sha1 "8c8627010c9390cb72054fba3f8eea419a67bb2b" => :mountain_lion
+    sha256 "1dd17f0b0325dd607c46a4bc5ff8e047403c4ef0a94c5acf060e59ab49fd6338" => :yosemite
+    sha256 "a18d196cc10738fe4ba8ca10440e75aeef15679c7af803bf11e2b8f57f0fc745" => :mavericks
+    sha256 "8313511a6bd0f9ae9b6390bd3952c67982372873ea4ba59f54c3ad2ea56032ec" => :mountain_lion
   end
 
   deprecated_option "disable-fortran" => "without-fortran"
