@@ -1,6 +1,4 @@
-require "formula"
-
-class TransitionalMode < Requirement
+class Camlp5TransitionalModeRequirement < Requirement
   fatal true
 
   satisfy { !Tab.for_name("camlp5").include?("strict") }
@@ -13,10 +11,11 @@ class TransitionalMode < Requirement
 end
 
 class Coq < Formula
+  desc "Proof assistant for higher-order logic"
   homepage "https://coq.inria.fr/"
   url "https://coq.inria.fr/distrib/V8.4pl6/files/coq-8.4pl6.tar.gz"
   version "8.4pl6"
-  sha1 "c89525295659a805661ef91da24ecfb94e226953"
+  sha256 "a540a231a9970a49353ca039f3544616ff86a208966ab1c593779ae13c91ebd6"
 
   head "git://scm.gforge.inria.fr/coq/coq.git", :branch => "trunk"
 
@@ -26,7 +25,7 @@ class Coq < Formula
     sha256 "3dcdec51e2d2402d6ec9bca3f5f1d29a486995fcccfbb46e9b023f18715a4968" => :mountain_lion
   end
 
-  depends_on TransitionalMode
+  depends_on Camlp5TransitionalModeRequirement
   depends_on "objective-caml"
   depends_on "camlp5"
 

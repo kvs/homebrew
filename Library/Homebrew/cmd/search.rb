@@ -2,6 +2,7 @@ require 'formula'
 require 'blacklist'
 require 'utils'
 require 'thread'
+require "official_taps"
 
 module Homebrew
 
@@ -22,9 +23,10 @@ module Homebrew
       exec_browser "http://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
     elsif ARGV.include? '--desc'
       query = ARGV.next
+      rx = query_regexp(query)
       Formula.each do |formula|
-        if formula.desc =~ query_regexp(query)
-          puts "#{formula.name}: #{formula.desc}"
+        if formula.desc =~ rx
+          puts "#{formula.full_name}: #{formula.desc}"
         end
       end
     elsif ARGV.empty?
@@ -81,19 +83,7 @@ module Homebrew
     raise SEARCH_ERROR_QUEUE.pop unless SEARCH_ERROR_QUEUE.empty?
   end
 
-  SEARCHABLE_TAPS = [
-    %w{Homebrew nginx},
-    %w{Homebrew apache},
-    %w{Homebrew versions},
-    %w{Homebrew dupes},
-    %w{Homebrew games},
-    %w{Homebrew science},
-    %w{Homebrew completions},
-    %w{Homebrew binary},
-    %w{Homebrew python},
-    %w{Homebrew php},
-    %w{Homebrew tex},
-    %w{Homebrew x11},
+  SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } + [
     %w{Caskroom cask},
   ]
 

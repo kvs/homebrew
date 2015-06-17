@@ -1,13 +1,15 @@
 class Python < Formula
+  desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org"
   head "https://hg.python.org/cpython", :using => :hg, :branch => "2.7"
   url "https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz"
   sha256 "eda8ce6eec03e74991abb5384170e7c65fcd7522e409b8e83d7e6372add0f12a"
 
   bottle do
-    sha256 "726e13ae4d0befdc86ae82c1585393de814609d8f6b2fda5ef2be8514f654c4d" => :yosemite
-    sha256 "def214085072e3c22e135f3b07b02fd535abc9b6b3c7128311d875852d1b62db" => :mavericks
-    sha256 "f8b4cded09f4018342e188c09c3f4796b6919727c1259c1bd06d7885c8fc4d53" => :mountain_lion
+    revision 2
+    sha256 "c09a2be2afed41d72235364fac7b172e07f248c28b24ceee8d3be2084bf2b138" => :yosemite
+    sha256 "08b8454aa0a753feffb7db0601485ae1f79253c0094917b6ddbabe7354e8de13" => :mavericks
+    sha256 "1ec521bf24e2c1b87e7739811b9e7413edc1a2dd008714b416b7c110d97e2a3b" => :mountain_lion
   end
 
   # Please don't add a wide/ucs4 option as it won't be accepted.
@@ -32,13 +34,13 @@ class Python < Formula
   skip_clean "bin/easy_install", "bin/easy_install-2.7"
 
   resource "setuptools" do
-    url "https://pypi.python.org/packages/source/s/setuptools/setuptools-16.0.tar.gz"
-    sha256 "aa86255dee2c4a0056509750008007667c29306b7a6c13801468515b2c672845"
+    url "https://pypi.python.org/packages/source/s/setuptools/setuptools-17.1.1.tar.gz"
+    sha256 "5bf42dbf406fd58a41029f53cffff1c90db5de1c5e0e560b5545cf2ec949c431"
   end
 
   resource "pip" do
-    url "https://pypi.python.org/packages/source/p/pip/pip-6.1.1.tar.gz"
-    sha256 "89f3b626d225e08e7f20d85044afa40f612eb3284484169813dc2d0631f2a556"
+    url "https://pypi.python.org/packages/source/p/pip/pip-7.0.3.tar.gz"
+    sha256 "b4c598825a6f6dc2cac65968feb28e6be6c1f7f1408493c60a07eaa731a0affd"
   end
 
   # Patch for pyport.h macro issue
@@ -109,11 +111,13 @@ class Python < Formula
     # Avoid linking to libgcc https://code.activestate.com/lists/python-dev/112195/
     args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
 
-    # We want our readline! This is just to outsmart the detection code,
+    # We want our readline and openssl! This is just to outsmart the detection code,
     # superenv handles that cc finds includes/libs!
-    inreplace "setup.py",
-              "do_readline = self.compiler.find_library_file(lib_dirs, 'readline')",
+    inreplace "setup.py" do |s|
+      s.gsub! "do_readline = self.compiler.find_library_file(lib_dirs, 'readline')",
               "do_readline = '#{Formula["readline"].opt_lib}/libhistory.dylib'"
+      s.gsub! "/usr/local/ssl", Formula["openssl"].opt_prefix
+    end
 
     if build.universal?
       ENV.universal_binary
@@ -213,8 +217,8 @@ class Python < Formula
     end
 
     # Help distutils find brewed stuff when building extensions
-    include_dirs = [HOMEBREW_PREFIX/"include"]
-    library_dirs = [HOMEBREW_PREFIX/"lib"]
+    include_dirs = [HOMEBREW_PREFIX/"include", Formula["openssl"].opt_include]
+    library_dirs = [HOMEBREW_PREFIX/"lib", Formula["openssl"].opt_lib]
 
     if build.with? "sqlite"
       include_dirs << Formula["sqlite"].opt_include
