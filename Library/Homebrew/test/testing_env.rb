@@ -11,9 +11,10 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
     coverage_dir File.expand_path("#{tests_path}/coverage")
     root File.expand_path("#{tests_path}/..")
 
-    add_filter "Homebrew/test"
-    add_filter "vendor/bundle"
-    add_filter "Homebrew/vendor"
+    add_filter "Homebrew/test/"
+    add_filter "vendor/bundle/"
+    add_filter "Homebrew/vendor/"
+    add_filter "Homebrew/compat/"
   end
 end
 
@@ -78,7 +79,7 @@ module Homebrew
 
   class TestCase < ::Minitest::Test
     include VersionAssertions
-    include FSLeakLogger if ENV["LOG_FS_LEAKS"]
+    include FSLeakLogger
 
     TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze

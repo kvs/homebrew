@@ -500,7 +500,7 @@ module Homebrew
       # Don't care about e.g. bottle failures for dependencies.
       run_as_not_developer do
         test "brew", "install", "--only-dependencies", *install_args unless dependencies.empty?
-        test "brew", "install", *install_args
+        test "brew", "install", "--build-from-source", *install_args
       end
       install_passed = steps.last.passed?
       audit_args = [canonical_formula_name]
@@ -508,7 +508,7 @@ module Homebrew
       test "brew", "audit", *audit_args
       if install_passed
         if formula.stable? && !ARGV.include?('--no-bottle')
-          bottle_args = ["--rb", canonical_formula_name]
+          bottle_args = ["--verbose", "--rb", canonical_formula_name]
           bottle_args << { :puts_output_on_success => true }
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
@@ -560,6 +560,7 @@ module Homebrew
       @category = __method__
       return if ARGV.include? "--skip-homebrew"
       test "brew", "tests"
+      test "brew", "tests", "--no-compat"
       readall_args = []
       readall_args << "--syntax" if MacOS.version >= :mavericks
       test "brew", "readall", *readall_args
