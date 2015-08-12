@@ -1,14 +1,14 @@
 class Mycli < Formula
   desc "CLI for MySQL with auto-completion and syntax highlighting"
   homepage "http://mycli.net/"
-  url "https://pypi.python.org/packages/source/m/mycli/mycli-1.0.0.tar.gz"
-  sha256 "4d9258440b3a569066dc3c74a29d787bf89b0914aace080e6baa7dbf7ddb5f40"
+  url "https://pypi.python.org/packages/source/m/mycli/mycli-1.2.0.tar.gz"
+  sha256 "5a440fab6af03272e932e90a97e625fb8b304cfbf134ea2ccee14e2cb2e261e9"
 
   bottle do
     cellar :any
-    sha256 "7c38c538c674adcad3ea3a53486e35c6f21ff6d2c62d14d51eb57820c5ec472a" => :yosemite
-    sha256 "ad59d7f12743b3aaffd0b767ab7369f299a3fa86a6189d16ea9bb916cf9148b6" => :mavericks
-    sha256 "1a31ee972d8e8f753f224099c42e37d2f5e918349d4c06bda9e857dff9d3e6a9" => :mountain_lion
+    sha256 "7e63b349ad3702b250ca3c68c11c61304b3b2f40274e6c800fee6a3b3a5a9008" => :yosemite
+    sha256 "af16063570d59926e289a9bb79a6424cd6312a62a31c4f6ef7a3025486363336" => :mavericks
+    sha256 "e6bb679213f65af9e5be2094228e8b8258a03c2753eb2910f49be93477838ca4" => :mountain_lion
   end
 
   depends_on :python if MacOS.version <= :snow_leopard
@@ -25,8 +25,8 @@ class Mycli < Formula
   end
 
   resource "prompt_toolkit" do
-    url "https://pypi.python.org/packages/source/p/prompt_toolkit/prompt_toolkit-0.38.tar.gz"
-    sha256 "6cee2959747580a1f93e3e14ef2826f1d89845d19e5bc32f374c23988e2d5e66"
+    url "https://pypi.python.org/packages/source/p/prompt_toolkit/prompt_toolkit-0.45.tar.gz"
+    sha256 "553fd2b9169674adacf227ede2e056c2bbd7181a4a3ca614960467c0720997a6"
   end
 
   resource "Pygments" do

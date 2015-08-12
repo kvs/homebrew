@@ -4,11 +4,12 @@ class Ffmpeg < Formula
   url "https://ffmpeg.org/releases/ffmpeg-2.7.2.tar.bz2"
   sha256 "7ceb7550ad628c526fa6c9ff23fdfb687a62f54d90c4a730998d8c2b417b9ef2"
   head "https://github.com/FFmpeg/FFmpeg.git"
+  revision 1
 
   bottle do
-    sha256 "6fb5e99bf57daaae6d0633a5bd516aaa29f91b061d73b584a23c9ab67312a683" => :yosemite
-    sha256 "72a661e15d4f97243dd5c446bd4a71c3b04f99486108ad32a7a686cb6c2f36a0" => :mavericks
-    sha256 "d8cc79630b241e6d46c1e51c66e20cd57655c3b1a091c03a7ad653c0f04777ed" => :mountain_lion
+    sha256 "060199677b66b5b745612ef01893893a688af372763621666a3e9425c1c5a144" => :yosemite
+    sha256 "ea3800f6731c92c0e0274ed1677fd4a39067f7e620b7fe9d460f4a4c3a3a0378" => :mavericks
+    sha256 "1615e14ba8159b46794fa46a83dd733df73df6699fd69036ecd3ce5e49182618" => :mountain_lion
   end
 
   option "without-x264", "Disable H.264 encoder"
@@ -81,8 +82,10 @@ class Ffmpeg < Formula
             "--enable-avresample",
             "--cc=#{ENV.cc}",
             "--host-cflags=#{ENV.cflags}",
-            "--host-ldflags=#{ENV.ldflags}",
+            "--host-ldflags=#{ENV.ldflags}"
            ]
+
+    args << "--enable-opencl" if MacOS.version > :lion
 
     args << "--enable-libx264" if build.with? "x264"
     args << "--enable-libmp3lame" if build.with? "lame"

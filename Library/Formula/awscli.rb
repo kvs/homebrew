@@ -1,15 +1,15 @@
 class Awscli < Formula
   desc "Official Amazon AWS command-line interface"
   homepage "https://aws.amazon.com/cli/"
-  url "https://pypi.python.org/packages/source/a/awscli/awscli-1.7.41.tar.gz"
-  mirror "https://github.com/aws/aws-cli/archive/1.7.41.tar.gz"
-  sha256 "c19baa45b1c2c16be9e5cc90b20b43c50dabf8f5356e3362ae9e408762c64a4c"
+  url "https://pypi.python.org/packages/source/a/awscli/awscli-1.7.44.tar.gz"
+  mirror "https://github.com/aws/aws-cli/archive/1.7.44.tar.gz"
+  sha256 "2fe9b79edd765f6b6eda7fb5913b8e1e3074272846324312e22e418cbea1e586"
 
   bottle do
     cellar :any
-    sha256 "06f4a7c35737f2cdaa532ada4505fbb2c07ddf05e81f1daee67442611e726855" => :yosemite
-    sha256 "f0ccf9cd55eebef924ed2f2d24a898ab55b7b31be7a10e5ec3ac5df41ac492fa" => :mavericks
-    sha256 "f37d5a7f2f8451a840e3f2ca41d9bf6f888a81bd1830725a2ca5b066aab4adfa" => :mountain_lion
+    sha256 "fa466fc7b47d972c637ced78f23445b318c398d0070dee9998ab7b5804c889ef" => :yosemite
+    sha256 "c838a69a98cce2fab563e889ea126030e6f8e51a957b8e2006327b88dc378c72" => :mavericks
+    sha256 "cbd3ff5eb5e23d8e01a7d19866244f1a57dff011f407b3e3a567fcbc093c98d4" => :mountain_lion
   end
 
   head do
@@ -50,8 +50,8 @@ class Awscli < Formula
   end
 
   resource "botocore" do
-    url "https://pypi.python.org/packages/source/b/botocore/botocore-1.1.4.tar.gz"
-    sha256 "774efc121d3f1a47ab0cb954914d1ea92259acd6d63e180cd4df2de381546bf1"
+    url "https://pypi.python.org/packages/source/b/botocore/botocore-1.1.7.tar.gz"
+    sha256 "b9fca4f0ff943154dd376a1265896e2ef57e7d0a5829845b99da0768fe499663"
   end
 
   resource "docutils" do
@@ -90,7 +90,7 @@ class Awscli < Formula
     zsh_completion.install "bin/aws_zsh_completer.sh" => "_aws"
 
     # Install the examples
-    (share+"awscli").install "awscli/examples"
+    pkgshare.install "awscli/examples"
 
     bin.install Dir[libexec/"bin/*"]
     bin.env_script_all_files(libexec+"bin", :PYTHONPATH => ENV["PYTHONPATH"])

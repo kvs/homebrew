@@ -1,18 +1,16 @@
-require "formula"
-
 class Mackup < Formula
   desc "Keep your Mac's application settings in sync"
   homepage "https://github.com/lra/mackup"
-  url "https://pypi.python.org/packages/source/m/mackup/mackup-0.8.6.tar.gz"
-  sha256 "a011d85ec8f83e8219b103f101e5c4670b49c2c08e6bc478cb6a828a041bfe64"
+  url "https://github.com/lra/mackup/archive/0.8.9.tar.gz"
+  sha256 "9c8a9fe64446256cf86a116296105e2009e8e5c9421512962219690af7372741"
 
   head "https://github.com/lra/mackup.git"
 
   bottle do
     cellar :any
-    sha256 "a8090beac29eaf4bf0c1fafd51b3e951f172b0861d1ea53d58142ba73b9238a2" => :yosemite
-    sha256 "9146ff2dab3d0b6da260570c84abe531d9d4f23c568d593fb79429629b3892e0" => :mavericks
-    sha256 "3fc98483934fd83caec5ae740a3ccf347a9c2dfac4bf3b62893fb72fec30925d" => :mountain_lion
+    sha256 "a9475c446193be3437ebad1311e3bab3fac37537a32e93a1360e487f565dc4b5" => :yosemite
+    sha256 "8b1ab55afb72c546a7199ff0ce41113dbf703101dbcfab7dc22c9c42dcc3aa18" => :mavericks
+    sha256 "e8a2d717761fc3bb807c5926c757f7343e9d2d612bb04e42b1402b7722d76e97" => :mountain_lion
   end
 
   depends_on :python if MacOS.version <= :snow_leopard

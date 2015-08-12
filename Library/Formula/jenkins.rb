@@ -1,14 +1,14 @@
 class Jenkins < Formula
   desc "Extendable open source continuous integration server"
   homepage "https://jenkins-ci.org"
-  url "http://mirrors.jenkins-ci.org/war/1.622/jenkins.war"
-  sha256 "e219546e9db0bdf913ceee04ab3f79fcbbb27ac7ca27619d184b82f93457b899"
+  url "http://mirrors.jenkins-ci.org/war/1.624/jenkins.war"
+  sha256 "f8be718fe5ca3b025f53c89ddb484e1844995902816f739f93f5d2746e6db48a"
 
   bottle do
     cellar :any
-    sha256 "dfcbc53fd68537da7975209ed8adee8887e0fd106c86a44823defbc580ba1ca4" => :yosemite
-    sha256 "74c689f2e749b3ac26b8a4cf4631649d0565696b10aa430e1168f3fc5a60917b" => :mavericks
-    sha256 "356c460681bb460d3f4cdb89b86446b4c899db6cf6cdf5018a448fb86e266b96" => :mountain_lion
+    sha256 "01a81aef39d3e86505963c3f616b66727b9ffabd95a58579b5c490b81cb46c82" => :yosemite
+    sha256 "52f70b1f5728971ccd26b36fb4e0463b7ff9f16a597e0ba4258b0811d3bea431" => :mavericks
+    sha256 "c61099c5fd0c00113d4f96ebf904957e1daabafe733279aa6fd32271574820e0" => :mountain_lion
   end
 
   head do
@@ -56,6 +56,20 @@ class Jenkins < Formula
 
   def caveats; <<-EOS.undent
     Note: When using launchctl the port will be 8080.
-    EOS
+  EOS
+  end
+
+  test do
+    pid = fork do
+      exec "#{bin}/jenkins"
+    end
+    sleep 60
+
+    begin
+      assert_match /"mode":"NORMAL"/, shell_output("curl localhost:8080/api/json")
+    ensure
+      Process.kill("SIGINT", pid)
+      Process.wait(pid)
+    end
   end
 end
