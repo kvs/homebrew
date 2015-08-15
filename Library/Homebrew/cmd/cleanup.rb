@@ -4,10 +4,6 @@ require "bottles"
 
 module Homebrew
   def cleanup
-    # individual cleanup_ methods should also check for the existence of the
-    # appropriate directories before assuming they exist
-    return unless HOMEBREW_CELLAR.directory?
-
     if ARGV.named.empty?
       cleanup_cellar
       cleanup_cache
@@ -23,19 +19,20 @@ module Homebrew
 
   def cleanup_logs
     return unless HOMEBREW_LOGS.directory?
-    time = Time.now - 2 * 7 * 24 * 60 * 60 # two weeks
+    prune = ARGV.value "prune"
+    if prune
+      time = Time.now - 60 * 60 * 24 * prune.to_i
+    else
+      time = Time.now - 60 * 60 * 24 * 7 * 2 # two weeks
+    end
     HOMEBREW_LOGS.subdirs.each do |dir|
-      cleanup_path(dir) { dir.rmtree } if dir.mtime < time
+      cleanup_path(dir) { dir.rmtree } if ARGV.force? || (dir.mtime < time)
     end
   end
 
   def cleanup_cellar
-    HOMEBREW_CELLAR.subdirs.each do |rack|
-      begin
-        cleanup_formula Formulary.from_rack(rack)
-      rescue FormulaUnavailableError, TapFormulaAmbiguityError
-        # Don't complain about directories from DIY installs
-      end
+    Formula.installed.each do |formula|
+      cleanup_formula formula
     end
   end
 
@@ -66,8 +63,18 @@ module Homebrew
     return unless HOMEBREW_CACHE.directory?
     prune = ARGV.value "prune"
     time = Time.now - 60 * 60 * 24 * prune.to_i
-    HOMEBREW_CACHE.children.select(&:file?).each do |file|
-      next cleanup_path(file) { file.unlink } if prune && file.mtime < time
+    HOMEBREW_CACHE.children.each do |path|
+      if ARGV.force? || (prune && path.mtime < time)
+        if path.file?
+          cleanup_path(path) { path.unlink }
+        elsif path.directory? && path.to_s.include?("--")
+          cleanup_path(path) { FileUtils.rm_rf path }
+        end
+        next
+      end
+
+      next unless path.file?
+      file = path
 
       if Pathname::BOTTLE_EXTNAME_RX === file.to_s
         version = bottle_resolve_version(file) rescue file.version
@@ -76,6 +83,8 @@ module Homebrew
       end
       next unless version
       next unless (name = file.basename.to_s[/(.*)-(?:#{Regexp.escape(version)})/, 1])
+
+      next unless HOMEBREW_CELLAR.directory?
 
       begin
         f = Formulary.from_rack(HOMEBREW_CELLAR/name)

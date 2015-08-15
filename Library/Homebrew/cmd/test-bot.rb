@@ -606,8 +606,12 @@ module Homebrew
       if ARGV.include? "--cleanup"
         test "git", "reset", "--hard"
         git "stash", "pop"
-        test "brew", "cleanup", "--prune=30"
+        test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
+        if ARGV.include? "--local"
+          FileUtils.rm_rf ENV["HOMEBREW_HOME"]
+          FileUtils.rm_rf ENV["HOMEBREW_LOGS"]
+        end
       end
 
       FileUtils.rm_rf @brewbot_root unless ARGV.include? "--keep-logs"
@@ -717,7 +721,7 @@ module Homebrew
     end
 
     if ARGV.include? "--local"
-      ENV["HOME"] = "#{Dir.pwd}/home"
+      ENV["HOMEBREW_HOME"] = ENV["HOME"] = "#{Dir.pwd}/home"
       mkdir_p ENV["HOME"]
       ENV["HOMEBREW_LOGS"] = "#{Dir.pwd}/logs"
     end
