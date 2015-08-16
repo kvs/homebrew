@@ -19,14 +19,8 @@ module Homebrew
 
   def cleanup_logs
     return unless HOMEBREW_LOGS.directory?
-    prune = ARGV.value "prune"
-    if prune
-      time = Time.now - 60 * 60 * 24 * prune.to_i
-    else
-      time = Time.now - 60 * 60 * 24 * 7 * 2 # two weeks
-    end
     HOMEBREW_LOGS.subdirs.each do |dir|
-      cleanup_path(dir) { dir.rmtree } if ARGV.force? || (dir.mtime < time)
+      cleanup_path(dir) { dir.rmtree } if prune?(dir, :days_default => 14)
     end
   end
 
@@ -61,10 +55,8 @@ module Homebrew
 
   def cleanup_cache
     return unless HOMEBREW_CACHE.directory?
-    prune = ARGV.value "prune"
-    time = Time.now - 60 * 60 * 24 * prune.to_i
     HOMEBREW_CACHE.children.each do |path|
-      if ARGV.force? || (prune && path.mtime < time)
+      if prune?(path)
         if path.file?
           cleanup_path(path) { path.unlink }
         elsif path.directory? && path.to_s.include?("--")
@@ -123,10 +115,41 @@ module Homebrew
   end
 
   def rm_DS_Store
-    paths = %w[Cellar Frameworks Library bin etc include lib opt sbin share var].
-            map { |p| HOMEBREW_PREFIX/p }.select(&:exist?)
-    args = paths.map(&:to_s) + %w[-name .DS_Store -delete]
-    quiet_system "find", *args
+    paths = Queue.new
+    %w[Cellar Frameworks Library bin etc include lib opt sbin share var].
+      map { |p| HOMEBREW_PREFIX/p }.select(&:exist?).each { |p| paths << p }
+    workers = (0...Hardware::CPU.cores).map do
+      Thread.new do
+        begin
+          while p = paths.pop(true)
+            quiet_system "find", p, "-name", ".DS_Store", "-delete"
+          end
+        rescue ThreadError # ignore empty queue error
+        end
+      end
+    end
+    workers.map(&:join)
+  end
+
+  def prune?(path, options={})
+    @time ||= Time.now
+
+    path_modified_time = path.mtime
+    days_default = options[:days_default]
+
+    prune = ARGV.value "prune"
+
+    return true if prune == "all"
+
+    prune_time = if prune
+      @time - 60 * 60 * 24 * prune.to_i
+    elsif days_default
+      @time - 60 * 60 * 24 * days_default.to_i
+    end
+
+    return false unless prune_time
+
+    path_modified_time < prune_time
   end
 
   def eligible_for_cleanup?(formula)
