@@ -270,14 +270,14 @@ Note that these flags should only appear after a command.
     If provided, `--local` will move them into the user's `~/Applications`
     directory instead of the system directory. It may need to be created, first.
 
-  * `ls, list [--full-name]`
+  * `ls`, `list [--full-name]`
     List all installed formulae. If `--full-name` is passed, print formulae with
     full-qualified names.
 
-  * `ls, list --unbrewed`
+  * `ls`, `list --unbrewed`
     List all files in the Homebrew prefix not installed by Homebrew.
 
-  * `ls, list [--versions [--multiple]] [--pinned]` [<formulae>]:
+  * `ls`, `list [--versions [--multiple]] [--pinned]` [<formulae>]:
     List the installed files for <formulae>. Combined with `--verbose`, recursively
     list the contents of all subdirectories in each <formula>'s keg.
 
@@ -302,8 +302,8 @@ Note that these flags should only appear after a command.
     Migrate renamed packages to new name, where <formulae> are old names of
     packages.
 
-    If `--force` is passed and installed <formulae> have nil tap, then treat
-    them like packages installed from core.
+    If `--force` is passed, then treat installed <formulae> and passed <formulae>
+    like if they are from same taps and migrate them anyway.
 
   * `options [--compact] [--all] [--installed]` <formula>:
     Display install options specific to <formula>.
