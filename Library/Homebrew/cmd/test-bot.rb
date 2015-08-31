@@ -398,23 +398,27 @@ module Homebrew
       if formula.stable
         return unless satisfied_requirements?(formula, :stable)
 
-        deps |= formula.stable.deps.to_a
-        reqs |= formula.stable.requirements.to_a
+        deps |= formula.stable.deps.to_a.reject(&:optional?)
+        reqs |= formula.stable.requirements.to_a.reject(&:optional?)
       elsif formula.devel
         return unless satisfied_requirements?(formula, :devel)
       end
 
       if formula.devel && !ARGV.include?("--HEAD")
-        deps |= formula.devel.deps.to_a
-        reqs |= formula.devel.requirements.to_a
+        deps |= formula.devel.deps.to_a.reject(&:optional?)
+        reqs |= formula.devel.requirements.to_a.reject(&:optional?)
+      end
+
+      begin
+        deps.each { |d| d.to_formula.recursive_dependencies }
+      rescue TapFormulaUnavailableError => e
+        raise if e.tap.installed?
+        safe_system "brew", "tap", e.tap.name
+        retry
       end
 
       begin
         deps.each do |dep|
-          if dep.is_a?(TapDependency) && dep.tap
-            tap_dir = Homebrew.homebrew_git_repo dep.tap
-            test "brew", "tap", dep.tap unless tap_dir.directory?
-          end
           CompilerSelector.select_for(dep.to_formula)
         end
         CompilerSelector.select_for(formula)

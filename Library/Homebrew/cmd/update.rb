@@ -56,7 +56,7 @@ module Homebrew
       tap_user, tap_repo = migration.split "/"
       install_tap tap_user, tap_repo
       # update tap for each Tab
-      tabs = dir.subdirs.each.map { |d| Tab.for_keg(Keg.new(d)) }
+      tabs = dir.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
       next if tabs.first.source["tap"] != "Homebrew/homebrew"
       tabs.each { |tab| tab.source["tap"] = "#{tap_user}/homebrew-#{tap_repo}" }
       tabs.each(&:write)
@@ -71,13 +71,21 @@ module Homebrew
         user, repo, oldname = oldname.split("/", 3)
         newname = newname.split("/", 3).last
       else
-        user, repo = "homebrew", "homebrew"
+        user = "homebrew"
+        repo = "homebrew"
       end
 
       next unless (dir = HOMEBREW_CELLAR/oldname).directory? && !dir.subdirs.empty?
 
       begin
-        migrator = Migrator.new(Formulary.factory("#{user}/#{repo}/#{newname}"))
+        f = Formulary.factory("#{user}/#{repo}/#{newname}")
+      rescue FormulaUnavailableError, *FormulaVersions::IGNORED_EXCEPTIONS
+      end
+
+      next unless f
+
+      begin
+        migrator = Migrator.new(f)
         migrator.migrate
       rescue Migrator::MigratorDifferentTapsError
       end
@@ -193,6 +201,8 @@ class Updater
 
     reset_on_interrupt { safe_system "git", *args }
 
+    @current_revision = read_current_revision
+
     if @initial_branch != "master" && !@initial_branch.empty?
       safe_system "git", "checkout", @initial_branch, *quiet
     end
@@ -205,8 +215,6 @@ class Updater
       end
       @stashed = false
     end
-
-    @current_revision = read_current_revision
   end
 
   def reset_on_interrupt
@@ -223,6 +231,8 @@ class Updater
     map = Hash.new { |h, k| h[k] = [] }
 
     if initial_revision && initial_revision != current_revision
+      wc_revision = read_current_revision
+
       diff.each_line do |line|
         status, *paths = line.split
         src = paths.first
@@ -238,7 +248,11 @@ class Updater
           file = repository.join(src)
           begin
             formula = Formulary.factory(file)
-            new_version = formula.pkg_version
+            new_version = if wc_revision == current_revision
+              formula.pkg_version
+            else
+              FormulaVersions.new(formula).formula_at_revision(@current_revision, &:pkg_version)
+            end
             old_version = FormulaVersions.new(formula).formula_at_revision(@initial_revision, &:pkg_version)
             next if new_version == old_version
           rescue FormulaUnavailableError, *FormulaVersions::IGNORED_EXCEPTIONS => e

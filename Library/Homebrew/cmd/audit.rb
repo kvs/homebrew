@@ -303,7 +303,7 @@ class FormulaAuditor
           problem <<-EOS.undent
             #{dep} dependency should be
               depends_on "#{dep}" => :build
-            Or if it is indeed a runtime denpendency
+            Or if it is indeed a runtime dependency
               depends_on "#{dep}" => :run
           EOS
         when "git"
@@ -374,7 +374,7 @@ class FormulaAuditor
       problem "Description should use \"command-line\" instead of \"#{$1}\""
     end
 
-    if desc =~ %r[^([Aa]n?)\s]
+    if desc =~ /^([Aa]n?)\s/
       problem "Please remove the indefinite article \"#{$1}\" from the beginning of the description"
     end
   end

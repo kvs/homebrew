@@ -1,14 +1,14 @@
 class Jenkins < Formula
   desc "Extendable open source continuous integration server"
   homepage "https://jenkins-ci.org"
-  url "http://mirrors.jenkins-ci.org/war/1.624/jenkins.war"
-  sha256 "f8be718fe5ca3b025f53c89ddb484e1844995902816f739f93f5d2746e6db48a"
+  url "http://mirrors.jenkins-ci.org/war/1.626/jenkins.war"
+  sha256 "e6df4d44f1110d1095b4e05c0d574f1120ac4f7bf943fba99c22edff0127c110"
 
   bottle do
     cellar :any
-    sha256 "01a81aef39d3e86505963c3f616b66727b9ffabd95a58579b5c490b81cb46c82" => :yosemite
-    sha256 "52f70b1f5728971ccd26b36fb4e0463b7ff9f16a597e0ba4258b0811d3bea431" => :mavericks
-    sha256 "c61099c5fd0c00113d4f96ebf904957e1daabafe733279aa6fd32271574820e0" => :mountain_lion
+    sha256 "27b888de2255abfbec3438d304e7c3e5ea3c3c98d50775b7b4456d505730bfd4" => :yosemite
+    sha256 "d1329ac5ed0f8afadcc6e651d7fe8dbbab46aa4aa8b54cc184f5c2abb8afa4ff" => :mavericks
+    sha256 "a28c12de6ef20c1aaf4799b11676bd3d1dd00f6f0557a29d3072898a0cf6edc9" => :mountain_lion
   end
 
   head do
@@ -60,6 +60,7 @@ class Jenkins < Formula
   end
 
   test do
+    ENV["JENKINS_HOME"] = testpath
     pid = fork do
       exec "#{bin}/jenkins"
     end
