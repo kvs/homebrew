@@ -3,6 +3,7 @@ require "blacklist"
 require "utils"
 require "thread"
 require "official_taps"
+require 'descriptions'
 
 module Homebrew
   SEARCH_ERROR_QUEUE = Queue.new
@@ -23,11 +24,7 @@ module Homebrew
     elsif ARGV.include? "--desc"
       query = ARGV.next
       rx = query_regexp(query)
-      Formula.each do |formula|
-        if formula.desc =~ rx
-          puts "#{Tty.white}#{formula.full_name}:#{Tty.reset} #{formula.desc}"
-        end
-      end
+      Descriptions.search(rx, :desc).print
     elsif ARGV.empty?
       puts_columns Formula.full_names
     elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
@@ -143,15 +140,16 @@ module Homebrew
     aliases = Formula.aliases
     results = (Formula.full_names+aliases).grep(rx).sort
 
-    results.each_with_index do |name, i|
+    results.map do |name|
       canonical_name = Formulary.canonical_name(name)
-      # Remove aliases from results when the full name was also found
+      # Ignore aliases from results when the full name was also found
       if aliases.include?(name) && results.include?(canonical_name)
-        results.delete_at(i)
-      # Notify the user if the formula is installed
+        next
       elsif (HOMEBREW_CELLAR/canonical_name).directory?
-        results[i] = "#{name} (installed)"
+        "#{name} (installed)"
+      else
+        name
       end
-    end
+    end.compact
   end
 end

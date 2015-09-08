@@ -916,22 +916,6 @@ class Formula
     "#<Formula #{name} (#{active_spec_sym}) #{path}>"
   end
 
-  # @private
-  def file_modified?
-    git = which("git")
-
-    # git isn't installed by older Xcodes
-    return false if git.nil?
-
-    # /usr/bin/git is a popup stub when Xcode/CLT aren't installed, so bail out
-    return false if git == "/usr/bin/git" && !MacOS.has_apple_developer_tools?
-
-    path.parent.cd do
-      diff = Utils.popen_read("git", "diff", "origin/master", "--", "#{path}")
-      !diff.empty? && $?.exitstatus == 0
-    end
-  end
-
   # Standard parameters for CMake builds.
   # Setting CMAKE_FIND_FRAMEWORK to "LAST" tells CMake to search for our
   # libraries before trying to utilize Frameworks, many of which will be from
