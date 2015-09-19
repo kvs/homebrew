@@ -1,15 +1,15 @@
 class ShadowsocksLibev < Formula
   desc "Libev port of shadowsocks"
   homepage "https://github.com/shadowsocks/shadowsocks-libev"
-  url "https://github.com/shadowsocks/shadowsocks-libev/archive/v2.3.0.tar.gz"
-  sha256 "e0a403cdbb20e2ad9934c9d20828265d4ab00f6a1fbaf4d52e9263b2a220f09f"
+  url "https://github.com/shadowsocks/shadowsocks-libev/archive/v2.3.2.tar.gz"
+  sha256 "789b42e45efce85bdc983574282cab0092f32443630d7fedda667cfbf85e5b40"
   head "https://github.com/shadowsocks/shadowsocks-libev.git"
 
   bottle do
     cellar :any
-    sha256 "a788de5728e0348180f380f040782fbbf5ef4f8593594b51a4e8029aa7c57b3a" => :yosemite
-    sha256 "ff062a629b1d83d3c46d5152ad9f6795ff9ddc71d847fe207f25a15ad8176e47" => :mavericks
-    sha256 "8d38c5e7569675c2f963d7659a81ddb52ea5ee4091d1b8a9af8d689f6fcce438" => :mountain_lion
+    sha256 "3adefa985247603c32b2deb7b23055717aa467c7d123cadeda940876d9c8eab8" => :yosemite
+    sha256 "e4471fb4bafbd8db32b4a2f344e1d1f6ae1b27a17dc4261f72f142b881ae5942" => :mavericks
+    sha256 "787cd61add6520f45242cef060903bc3a53b25279181b753da32592f79e27688" => :mountain_lion
   end
 
   depends_on "openssl"
@@ -20,8 +20,7 @@ class ShadowsocksLibev < Formula
     system "./configure", *args
     system "make"
 
-    bin.install "src/ss-local"
-    bin.install "src/ss-tunnel"
+    bin.install "src/ss-local", "src/ss-tunnel", "src/ss-server", "src/ss-manager"
 
     (buildpath/"shadowsocks-libev.json").write <<-EOS.undent
       {
@@ -35,8 +34,10 @@ class ShadowsocksLibev < Formula
     EOS
     etc.install "shadowsocks-libev.json"
 
-    inreplace "shadowsocks-libev.8", "/etc/shadowsocks-libev/config.json", "#{etc}/shadowsocks-libev.json"
-    man8.install "shadowsocks-libev.8"
+    rm "man/ss-redir.1"
+    inreplace Dir["man/*"], "/etc/shadowsocks-libev/config.json", "#{etc}/shadowsocks-libev.json"
+    man8.install Dir["man/*.8"]
+    man1.install Dir["man/*.1"]
   end
 
   plist_options :manual => "#{HOMEBREW_PREFIX}/opt/shadowsocks-libev/bin/ss-local -c #{HOMEBREW_PREFIX}/etc/shadowsocks-libev.json"

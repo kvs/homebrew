@@ -8,6 +8,7 @@ class Libgcrypt < Formula
 
   bottle do
     cellar :any
+    sha256 "c239866860860e717e646856b9870e7cd9ee0729b8700a40f8be47a174d29146" => :el_capitan
     sha256 "e8559d5c93be44c94a4652f74d8835a416b1771e492446c2a2d9da725460d5ca" => :yosemite
     sha256 "09a01dd58c81f0efb278d2e1270983ae4e477bb5fc4c54489dc6582084a147bb" => :mavericks
     sha256 "1c79948cbb7bb2750f23a6b3a91aafbd49ef0eb4d5868cabd91dcfb7592dac19" => :mountain_lion
@@ -40,14 +41,17 @@ class Libgcrypt < Formula
 
     # Parallel builds work, but only when run as separate steps
     system "make"
+    system "make", "install"
     # Make check currently dies on El Capitan
     # https://github.com/Homebrew/homebrew/issues/41599
     # https://bugs.gnupg.org/gnupg/issue2056
-    system "make", "check" unless MacOS.version >= :el_capitan
-    system "make", "install"
+    # This check should be above make install again when fixed.
+    system "make", "check"
   end
 
   test do
-    system bin/"libgcrypt-config", "--libs"
+    touch "testing"
+    output = shell_output("#{bin}/hmac256 \"testing\" testing")
+    assert_match /0e824ce7c056c82ba63cc40cffa60d3195b5bb5feccc999a47724cc19211aef6/, output
   end
 end

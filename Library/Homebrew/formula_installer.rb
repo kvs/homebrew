@@ -451,6 +451,9 @@ class FormulaInstaller
 
     ohai "Summary" if verbose? || show_summary_heading?
     puts summary
+
+    # let's reset Utils.git_available? if we just installed git
+    Utils.clear_git_available_cache if formula.name == "git"
   ensure
     unlock
   end
@@ -705,6 +708,8 @@ class FormulaInstaller
       keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s, :keg_only => formula.keg_only?
     end
+    keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
+      Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
 
     Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
       path.extend(InstallRenamed)
