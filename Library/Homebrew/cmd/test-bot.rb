@@ -142,7 +142,6 @@ module Homebrew
       end
 
       verbose = ARGV.verbose?
-      puts if verbose && !ENV["TRAVIS"]
       @output = ""
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
@@ -790,7 +789,7 @@ module Homebrew
     bottle_args = ["--merge", "--write", *Dir["*.bottle.rb"]]
     bottle_args << "--tap=#{tap}" if tap
     bottle_args << "--keep-old" if ARGV.include? "--keep-old"
-    safe_system "brew", "bottle", *bottle_args
+    system "brew", "bottle", *bottle_args
 
     remote_repo = tap ? "homebrew-#{tap.repo}" : "homebrew"
     remote = "git@github.com:BrewTestBot/#{remote_repo}.git"

@@ -6,24 +6,23 @@ class Node < Formula
   head "https://github.com/nodejs/node.git"
 
   bottle do
-    sha256 "d30bb690f2853791bd332fc5dc622f1c13297d8db818be2b2b8b8b2f3deef3b3" => :el_capitan
-    sha256 "dc21ed0dfce50badbbfe0663c7370b7faf81fe3145b71fc06c072ac8fe0843b1" => :yosemite
-    sha256 "d8238ecbf389b642b484991bcad54815feae8686c8b42d49dbd696aed49a522b" => :mavericks
+    revision 1
+    sha256 "e0adcefe208f3e79adac882d1b216545664dab70dda9d5ca189fb746b60bae13" => :el_capitan
+    sha256 "4c286bc21214c9555f3f9873db6ede862c8491420a767fcc43365e1a2622a2c9" => :yosemite
+    sha256 "72fb26e3873b3c58aca90353e1729c68ed42734782d132a56953c51e2a4c6d4c" => :mavericks
   end
 
   option "with-debug", "Build with debugger hooks"
   option "without-npm", "npm will not be installed"
   option "without-completion", "npm bash completion will not be installed"
+  option "with-full-icu", "Build with full-icu (all locales) instead of small-icu (English only)"
 
   deprecated_option "enable-debug" => "with-debug"
+  deprecated_option "with-icu4c" => "with-full-icu"
 
   depends_on :python => :build if MacOS.version <= :snow_leopard
   depends_on "pkg-config" => :build
   depends_on "openssl" => :optional
-
-  # https://github.com/nodejs/node-v0.x-archive/issues/7919
-  # https://github.com/Homebrew/homebrew/issues/36681
-  depends_on "icu4c" => :optional
 
   fails_with :llvm do
     build 2326
@@ -34,11 +33,24 @@ class Node < Formula
     sha256 "c8b602de5d51f956aa8f9c34d89be38b2df3b7c25ff6588030eb8224b070db27"
   end
 
+  resource "icu4c" do
+    url "https://ssl.icu-project.org/files/icu4c/55.1/icu4c-55_1-src.tgz"
+    mirror "https://fossies.org/linux/misc/icu4c-55_1-src.tgz"
+    version "55.1"
+    sha256 "e16b22cbefdd354bec114541f7849a12f8fc2015320ca5282ee4fd787571457b"
+  end
+
   def install
     args = %W[--prefix=#{prefix} --without-npm]
     args << "--debug" if build.with? "debug"
-    args << "--with-intl=system-icu" if build.with? "icu4c"
     args << "--shared-openssl" if build.with? "openssl"
+    if build.with? "full-icu"
+      args << "--with-intl=full-icu"
+    else
+      args << "--with-intl=small-icu"
+    end
+
+    resource("icu4c").stage buildpath/"deps/icu"
 
     system "./configure", *args
     system "make", "install"
@@ -105,18 +117,6 @@ class Node < Formula
       EOS
     end
 
-    if build.with? "icu4c"
-      s += <<-EOS.undent
-
-        Please note `icu4c` is built with a newer deployment target than Node and
-        this may cause issues in certain usage. Node itself is built against the
-        outdated `libstdc++` target, which is the root cause. For more information see:
-          https://github.com/nodejs/node-v0.x-archive/issues/7919
-
-        If this is an issue for you, do `brew install node --without-icu4c`.
-      EOS
-    end
-
     s
   end
 
@@ -126,6 +126,9 @@ class Node < Formula
 
     output = `#{bin}/node #{path}`.strip
     assert_equal "hello", output
+    assert_equal 0, $?.exitstatus
+    output = `#{bin}/node -e "console.log(new Date('2015-09-15').toLocaleDateString('en'))"`.strip
+    assert_match /9\/1[45]\/2015/u, output # depends on system timezone
     assert_equal 0, $?.exitstatus
 
     if build.with? "npm"
