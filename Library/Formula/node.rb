@@ -1,15 +1,14 @@
 class Node < Formula
   desc "Platform built on the V8 JavaScript runtime to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v4.1.0/node-v4.1.0.tar.gz"
-  sha256 "453005f64ee529f7dcf1237eb27ee2fa2415c49f5c9e7463e8b71fba61c5b408"
+  url "https://nodejs.org/dist/v4.1.1/node-v4.1.1.tar.gz"
+  sha256 "6a610935ff52de713cf2af6a26002322e24fd7933a444436f0817a2b84e15a58"
   head "https://github.com/nodejs/node.git"
 
   bottle do
-    revision 1
-    sha256 "e0adcefe208f3e79adac882d1b216545664dab70dda9d5ca189fb746b60bae13" => :el_capitan
-    sha256 "4c286bc21214c9555f3f9873db6ede862c8491420a767fcc43365e1a2622a2c9" => :yosemite
-    sha256 "72fb26e3873b3c58aca90353e1729c68ed42734782d132a56953c51e2a4c6d4c" => :mavericks
+    sha256 "ceb4a1721a9d312e9b3853d0cb4165dfa8b3a1d08e01620e56ac841092108c5c" => :el_capitan
+    sha256 "4c6b805490069a6e6b9956c85c0713e5fc666878f7e87d76b69279b61cff64ac" => :yosemite
+    sha256 "e082904a9b900ff07d3bb633a125542e2cedc4de854def6ec7683e7d2d976d51" => :mavericks
   end
 
   option "with-debug", "Build with debugger hooks"
@@ -128,7 +127,7 @@ class Node < Formula
     assert_equal "hello", output
     assert_equal 0, $?.exitstatus
     output = `#{bin}/node -e "console.log(new Date('2015-09-15').toLocaleDateString('en'))"`.strip
-    assert_match /9\/1[45]\/2015/u, output # depends on system timezone
+    assert_match %r{^9/1[45]/2015$}, output # depends on system timezone
     assert_equal 0, $?.exitstatus
 
     if build.with? "npm"
