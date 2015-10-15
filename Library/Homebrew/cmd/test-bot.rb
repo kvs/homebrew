@@ -590,6 +590,10 @@ module Homebrew
           if bottle_step.passed? && bottle_step.has_output?
             bottle_filename =
               bottle_step.output.gsub(/.*(\.\/\S+#{bottle_native_regex}).*/m, '\1')
+            bottle_rb_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".rb")
+            bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_rb_filename]
+            bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
+            test "brew", "bottle", *bottle_merge_args
             test "brew", "uninstall", "--force", canonical_formula_name
             if unchanged_build_dependencies.any?
               test "brew", "uninstall", "--force", *unchanged_build_dependencies
@@ -741,13 +745,16 @@ module Homebrew
 
     def run
       cleanup_before
-      download
-      setup
-      homebrew
-      formulae.each do |f|
-        formula(f)
+      begin
+        download
+        setup
+        homebrew
+        formulae.each do |f|
+          formula(f)
+        end
+      ensure
+        cleanup_after
       end
-      cleanup_after
       check_results
     end
   end
@@ -815,7 +822,6 @@ module Homebrew
     end
 
     bottle_args = ["--merge", "--write", *Dir["*.bottle.rb"]]
-    bottle_args << "--tap=#{tap}" if tap
     bottle_args << "--keep-old" if ARGV.include? "--keep-old"
     system "brew", "bottle", *bottle_args
 
@@ -1014,9 +1020,8 @@ module Homebrew
         file.write email_subject
       end
     end
-
+  ensure
     HOMEBREW_CACHE.children.each(&:rmtree) if ARGV.include? "--clean-cache"
-
     Homebrew.failed = any_errors
   end
 end
